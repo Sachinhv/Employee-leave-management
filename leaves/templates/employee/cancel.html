@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% block title %}Cancel Leave{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+<div class="card shadow border-danger">
+<div class="card-header bg-danger text-white"><h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Cancel Leave Application</h4></div>
+<div class="card-body">
+<div class="alert alert-warning"><strong><i class="fas fa-info-circle"></i> Warning:</strong> This action cannot be undone.</div>
+<div class="bg-light rounded p-3 mb-3">
+<p class="mb-1"><strong>Leave ID:</strong> <span class="badge badge-secondary">LEAVE-{{ leave.leave_id }}</span></p>
+<p class="mb-1"><strong>Type:</strong> {{ leave.get_leave_type_display }}</p>
+<p class="mb-1"><strong>From:</strong> {{ leave.start_date|date:"d M Y" }} → {{ leave.end_date|date:"d M Y" }}</p>
+<p class="mb-0"><strong>Days:</strong> {{ leave.total_days }}</p>
+</div>
+<form method="post">{% csrf_token %}
+<div class="d-flex justify-content-between">
+<a href="{% url 'employee_my_leaves' %}" class="btn btn-secondary"><i class="fas fa-times"></i> No, Keep It</a>
+<button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Cancel Application</button>
+</div></form>
+</div></div></div></div>
+{% endblock %}

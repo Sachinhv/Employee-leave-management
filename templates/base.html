@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Leave Management System{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <a class="navbar-brand font-weight-bold" href="{% url 'dashboard' %}">
+    <i class="fas fa-calendar-check mr-1"></i> LeaveMS
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNav">
+
+    {% if user.is_authenticated %}
+    <ul class="navbar-nav mr-auto">
+
+      {% if user.role == 'employee' %}
+        <!-- EMPLOYEE NAV -->
+        <li class="nav-item"><a class="nav-link" href="{% url 'employee_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'employee_apply' %}"><i class="fas fa-plus-circle"></i> Apply Leave</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'employee_my_leaves' %}"><i class="fas fa-list-alt"></i> My Leaves</a></li>
+
+      {% elif user.role == 'manager' %}
+        <!-- MANAGER NAV — No employee apply link here -->
+        <li class="nav-item"><a class="nav-link" href="{% url 'manager_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'manager_pending' %}">
+          <i class="fas fa-clock text-warning"></i> Pending Approvals</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'manager_team_leaves' %}"><i class="fas fa-users"></i> Team Leaves</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"><i class="fas fa-user"></i> My Leave</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="{% url 'manager_apply' %}"><i class="fas fa-plus-circle"></i> Apply My Leave</a>
+            <a class="dropdown-item" href="{% url 'manager_my_leaves' %}"><i class="fas fa-list-alt"></i> My Leave History</a>
+          </div>
+        </li>
+
+      {% elif user.role == 'admin' %}
+        <!-- ADMIN NAV — No apply form links -->
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin_pending' %}">
+          <i class="fas fa-clock text-warning"></i> Pending Approvals</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin_all_leaves' %}"><i class="fas fa-list-alt"></i> Manager Leaves</a></li>
+      {% endif %}
+
+    </ul>
+    <ul class="navbar-nav ml-auto align-items-center">
+      <li class="nav-item mr-3">
+        <a class="nav-link" href="{% url 'profile' %}">
+          <i class="fas fa-user-circle fa-lg"></i>
+          <strong> {{ user.username }}</strong>
+          <span class="badge badge-light ml-1">{{ user.get_role_display }}</span>
+          {% if user.department %}<span class="badge badge-info ml-1">{{ user.department }}</span>{% endif %}
+        </a>
+      </li>
+      <li class="nav-item">
+        <!-- POST logout — required Django 4.2+ -->
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
+      </li>
+    </ul>
+    {% else %}
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a></li>
+    </ul>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="container mt-3">
+  {% for msg in messages %}
+  <div class="alert {{ msg.tags }} alert-dismissible fade show shadow-sm">
+    <i class="fas fa-info-circle mr-1"></i> {{ msg }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- CONTENT -->
+<main class="container my-4">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-light text-center text-muted py-3 mt-5 border-top">
+  <small>
+    &copy; 2026 <strong>Leave Management System</strong> &mdash;
+    <i class="fas fa-heart text-danger"></i> Sachin HV
+  </small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Auto-dismiss alerts after 5 seconds
+  setTimeout(function(){ $('.alert').fadeOut('slow'); }, 5000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

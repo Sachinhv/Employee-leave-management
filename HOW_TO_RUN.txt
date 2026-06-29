@@ -1,0 +1,150 @@
+══════════════════════════════════════════════════════════════════
+   EMPLOYEE LEAVE MANAGEMENT SYSTEM — COMPLETE SETUP GUIDE
+   Python + Django | Role-Based Permissions
+══════════════════════════════════════════════════════════════════
+
+PERMISSION RULES:
+─────────────────────────────────────────────────────────────────
+ WHO APPLIES    WHO APPROVES   VISIBLE ON DASHBOARD
+─────────────────────────────────────────────────────────────────
+ Employee   →   Manager    →   Manager Dashboard ONLY
+ Manager    →   Admin      →   Admin Dashboard ONLY
+─────────────────────────────────────────────────────────────────
+ ✅ Employee CAN: apply leave, view own history, cancel pending
+ ✅ Manager CAN:  approve/reject employee leaves (same dept only)
+ ✅ Manager CAN:  apply own leave (sent to admin)
+ ✅ Admin CAN:    approve/reject manager leaves only
+
+ ❌ Employee CANNOT: approve any leave
+ ❌ Manager CANNOT: approve their own or other manager leaves
+ ❌ Manager Dashboard: NO apply-leave form shown
+ ❌ Admin Dashboard: NO apply-leave form shown
+ ❌ Admin CANNOT: see employee leaves
+─────────────────────────────────────────────────────────────────
+
+STEP 1 — Setup Virtual Environment
+─────────────────────────────────────────────────────────────────
+Windows:
+    python -m venv venv
+   inin
+
+Mac/Linux:
+    python3 -m venv venv
+    source venv/bin/activate
+
+STEP 2 — Install Dependencies
+─────────────────────────────────────────────────────────────────
+    pip install -r requirements.txt
+
+STEP 3 — Run Migrations (ORDER MATTERS)
+─────────────────────────────────────────────────────────────────
+    python manage.py makemigrations accounts
+    python manage.py makemigrations leaves
+    python manage.py migrate
+
+STEP 4 — Create Superuser
+─────────────────────────────────────────────────────────────────
+    python manage.py createsuperuser
+    (enter username, email, password)
+
+STEP 5 — Run Server
+─────────────────────────────────────────────────────────────────
+    python manage.py runserver
+
+Open: http://127.0.0.1:8000/
+
+══════════════════════════════════════════════════════════════════
+STEP 6 — SETUP USERS IN ADMIN PANEL
+══════════════════════════════════════════════════════════════════
+Go to: http://127.0.0.1:8000/admin/
+
+1. Set Superuser Role = admin
+   Open Users → click your superuser → scroll to Employee Info
+   Set Role = admin → SAVE
+
+2. Create Manager
+   + Add User → Username: manager1, Password: Manager@123 → SAVE
+   Then fill: Role = manager, Department = IT → SAVE
+
+3. Create Employee
+   + Add User → Username: employee1, Password: Emp@12345 → SAVE
+   Then fill: Role = employee, Department = IT → SAVE
+   ⚠️ Department MUST match manager's department exactly
+
+══════════════════════════════════════════════════════════════════
+TEST WORKFLOW
+══════════════════════════════════════════════════════════════════
+
+TEST 1 — Employee applies leave → Manager approves:
+    1. Login as employee1 → Apply Leave → Submit
+    2. Login as manager1  → Pending Approvals → Review → Approve
+    3. Login as employee1 → My Leaves → See APPROVED status
+
+TEST 2 — Manager applies own leave → Admin approves:
+    1. Login as manager1  → My Leave → Apply My Leave → Submit
+    2. Login as admin     → Pending Approvals → Review → Approve
+    3. Login as manager1  → My Leave History → See APPROVED status
+
+TEST 3 — Verify permissions:
+    - Login as employee1 → Try to access /manager/pending/ → Blocked
+    - Login as manager1  → Dashboard → No apply-leave form shown
+    - Login as admin     → Dashboard → Only manager leaves shown
+
+══════════════════════════════════════════════════════════════════
+URL REFERENCE
+══════════════════════════════════════════════════════════════════
+/                              → Auto-redirect to role dashboard
+
+EMPLOYEE URLS:
+/employee/dashboard/           → Employee dashboard
+/employee/apply/               → Apply leave
+/employee/my-leaves/           → My leave history
+/employee/cancel/<id>/         → Cancel leave
+
+MANAGER URLS:
+/manager/dashboard/            → Manager dashboard (employee leaves)
+/manager/pending/              → Pending employee leaves
+/manager/review/<id>/          → Approve/reject employee leave
+/manager/team-leaves/          → All team leaves
+/manager/my-apply/             → Manager applies own leave
+/manager/my-leaves/            → Manager's own leave history
+/manager/my-cancel/<id>/       → Cancel own leave
+
+ADMIN URLS:
+/admin-panel/dashboard/        → Admin dashboard (manager leaves)
+/admin-panel/pending/          → Pending manager leaves
+/admin-panel/review/<id>/      → Approve/reject manager leave
+/admin-panel/all-leaves/       → All manager leaves
+
+ACCOUNTS:
+/accounts/login/               → Login
+/accounts/logout/              → Logout (POST)
+/accounts/register/            → Register new user
+/accounts/profile/             → Edit profile
+/admin/                        → Django admin
+
+══════════════════════════════════════════════════════════════════
+COMMON ERRORS & FIXES
+══════════════════════════════════════════════════════════════════
+No module 'crispy_forms'       → pip install crispy-forms crispy-bootstrap4
+Logout not working             → Already fixed (POST form in base.html)
+LeaveBalance DoesNotExist      → Already fixed (get_or_create used)
+Permission denied page         → Check user role in admin panel
+Department mismatch            → Employee & Manager dept must match exactly
+
+══════════════════════════════════════════════════════════════════
+RESUME DESCRIPTION
+══════════════════════════════════════════════════════════════════
+Employee Leave Management System | Python, Django, SQLite, Bootstrap 4
+
+• 3-tier role-based access control (Employee → Manager → Admin)
+• Employee leaves require Manager approval (same department)
+• Manager leaves require Admin approval
+• Separate dashboards per role with strict permission enforcement
+• Primary key (leave_id) visible across all leave tracking tables
+• Auto leave balance deduction on approval
+• Email notification system (dev: console, prod: SMTP)
+• Responsive Bootstrap 4 UI with separate templates per role
+• Tech: Django 4.2, SQLite, HTML5, CSS3, JavaScript, Bootstrap 4
+
+══════════════════════════════════════════════════════════════════

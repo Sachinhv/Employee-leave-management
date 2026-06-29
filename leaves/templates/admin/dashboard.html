@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="mb-0">
+      <i class="fas fa-shield-alt text-danger"></i> Admin Dashboard
+    </h2>
+    <p class="text-muted mb-0">
+      Welcome, <strong>{{ user.get_full_name|default:user.username }}</strong>
+      <span class="badge badge-danger ml-2">Admin</span>
+    </p>
+    <small class="text-muted">
+      <i class="fas fa-info-circle"></i>
+      This dashboard shows <strong>all leave applications (manager & employee)</strong>.
+    </small>
+  </div>
+
+  <a href="{% url 'admin_pending' %}" class="btn btn-warning btn-lg shadow">
+    <i class="fas fa-clock"></i> Pending Leave Applications
+    {% if pending_count > 0 %}
+    <span class="badge badge-dark ml-1">{{ pending_count }}</span>
+    {% endif %}
+  </a>
+</div>
+
+
+<!-- Stats -->
+<div class="row mb-4">
+  <div class="col-md-3 col-6 mb-3">
+    <div class="card bg-warning text-white shadow">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <p class="small text-uppercase mb-0 font-weight-bold">Pending</p>
+          <h2 class="mb-0">{{ pending_count }}</h2>
+        </div>
+        <i class="fas fa-clock fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6 mb-3">
+    <div class="card bg-success text-white shadow">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <p class="small text-uppercase mb-0 font-weight-bold">Approved</p>
+          <h2 class="mb-0">{{ approved_count }}</h2>
+        </div>
+        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6 mb-3">
+    <div class="card bg-danger text-white shadow">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <p class="small text-uppercase mb-0 font-weight-bold">Rejected</p>
+          <h2 class="mb-0">{{ rejected_count }}</h2>
+        </div>
+        <i class="fas fa-times-circle fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 col-6 mb-3">
+    <div class="card bg-info text-white shadow">
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <p class="small text-uppercase mb-0 font-weight-bold">Total Leave Applications</p>
+          <h2 class="mb-0">{{ total_count }}</h2>
+        </div>
+        <i class="fas fa-layer-group fa-2x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+
+  <!-- Sidebar -->
+  <div class="col-md-4 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="fas fa-users-cog"></i> All Managers</strong>
+      </div>
+      <div class="card-body p-0">
+        {% if managers %}
+        <ul class="list-group list-group-flush">
+          {% for mgr in managers %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ mgr.get_full_name|default:mgr.username }}</strong>
+              <br>
+              <small class="text-muted">
+                <i class="fas fa-building"></i> {{ mgr.department }}
+              </small>
+            </div>
+            <span class="badge badge-primary">Manager</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-center text-muted py-3">No managers created yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow mt-3">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="fas fa-tools"></i> Admin Actions</strong>
+      </div>
+      <div class="card-body">
+        <a href="{% url 'admin_pending' %}" class="btn btn-warning btn-block mb-2">
+          <i class="fas fa-clock"></i> Review Pending ({{ pending_count }})
+        </a>
+        <a href="{% url 'admin_all_leaves' %}" class="btn btn-secondary btn-block mb-2">
+          <i class="fas fa-list-alt"></i> All Leave Applications
+        </a>
+        <a href="/admin/" class="btn btn-dark btn-block">
+          <i class="fas fa-cog"></i> Django Admin Panel
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Leave Applications -->
+  <div class="col-md-8 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-danger text-white d-flex justify-content-between">
+        <strong><i class="fas fa-list-alt"></i> Recent Leave Applications</strong>
+        <a href="{% url 'admin_all_leaves' %}" class="btn btn-sm btn-light">View All</a>
+      </div>
+
+      <div class="card-body p-0">
+        {% if recent_leaves %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Leave ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Dept</th>
+                <th>Type</th>
+                <th>From</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leave in recent_leaves %}
+              <tr>
+                <td><span class="badge badge-secondary">LEAVE-{{ leave.leave_id }}</span></td>
+                <td>
+                  <strong>{{ leave.applicant.get_full_name|default:leave.applicant.username }}</strong>
+                  <br>
+                  <small class="text-muted">{{ leave.applicant.employee_id }}</small>
+                </td>
+                <td>
+                  {% if leave.applicant.role == "manager" %}
+                  <span class="badge badge-primary">Manager</span>
+                  {% else %}
+                  <span class="badge badge-dark">Employee</span>
+                  {% endif %}
+                </td>
+                <td><span class="badge badge-info">{{ leave.applicant.department }}</span></td>
+                <td>{{ leave.get_leave_type_display }}</td>
+                <td>{{ leave.start_date|date:"d M Y" }}</td>
+                <td>{{ leave.total_days }}</td>
+                <td><span class="badge badge-{{ leave.status_badge }} p-2">{{ leave.get_status_display }}</span></td>
+                <td>
+                  <a href="{% url 'leave_detail' leave.leave_id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  {% if leave.is_pending %}
+                  <a href="{% url 'admin_review' leave.leave_id %}" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-gavel"></i>
+                  </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-inbox fa-4x mb-3"></i>
+          <p class="h5">No leave applications yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

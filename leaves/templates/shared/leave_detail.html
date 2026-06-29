@@ -1,0 +1,50 @@
+{% extends 'base.html' %}{% block title %}Leave Detail{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-8">
+<div class="card shadow">
+<div class="card-header bg-primary text-white d-flex justify-content-between">
+<h4 class="mb-0"><i class="fas fa-file-alt"></i> Leave Application Detail</h4>
+<span class="badge badge-{{ leave.status_badge }} p-2 align-self-center">{{ leave.get_status_display }}</span>
+</div>
+<div class="card-body">
+<div class="row mb-3">
+<div class="col-md-6">
+<p class="mb-1"><strong>Leave ID:</strong> <span class="badge badge-secondary badge-pill">LEAVE-{{ leave.leave_id }}</span></p>
+<p class="mb-1"><strong>Applicant:</strong> {{ leave.applicant.get_full_name|default:leave.applicant.username }}</p>
+<p class="mb-1"><strong>Role:</strong> <span class="badge badge-primary">{{ leave.applicant.get_role_display }}</span></p>
+<p class="mb-1"><strong>Employee ID:</strong> {{ leave.applicant.employee_id|default:"N/A" }}</p>
+<p class="mb-1"><strong>Department:</strong> {{ leave.applicant.department|default:"N/A" }}</p>
+</div>
+<div class="col-md-6">
+<p class="mb-1"><strong>Leave Type:</strong> {{ leave.get_leave_type_display }}</p>
+<p class="mb-1"><strong>From:</strong> {{ leave.start_date|date:"d M Y" }}</p>
+<p class="mb-1"><strong>To:</strong> {{ leave.end_date|date:"d M Y" }}</p>
+<p class="mb-1"><strong>Working Days:</strong> <strong class="text-primary">{{ leave.total_days }}</strong></p>
+<p class="mb-1"><strong>Applied On:</strong> {{ leave.applied_date|date:"d M Y, g:i A" }}</p>
+</div>
+</div>
+<div class="bg-light rounded p-3 mb-3">
+<strong>Reason:</strong><p class="mb-0 mt-1">{{ leave.reason }}</p>
+</div>
+{% if leave.status != 'pending' %}
+<div class="alert alert-{{ leave.status_badge }}">
+<h6 class="font-weight-bold"><i class="fas fa-gavel"></i> Review Decision</h6>
+<p class="mb-1"><strong>Reviewed By:</strong> {{ leave.reviewed_by.get_full_name|default:leave.reviewed_by.username|default:"—" }}</p>
+<p class="mb-1"><strong>Review Date:</strong> {{ leave.review_date|date:"d M Y, g:i A"|default:"—" }}</p>
+<p class="mb-0"><strong>Comment:</strong> {{ leave.review_comment|default:"No comment provided." }}</p>
+</div>
+{% endif %}
+<div class="d-flex justify-content-between mt-3">
+<a href="javascript:history.back()" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+{% if user.role == 'manager' and leave.is_pending and leave.applicant.role == 'employee' %}
+<a href="{% url 'manager_review' leave.leave_id %}" class="btn btn-success"><i class="fas fa-gavel"></i> Review Now</a>
+{% elif user.role == 'admin' and leave.is_pending and leave.applicant.role == 'manager' %}
+<a href="{% url 'admin_review' leave.leave_id %}" class="btn btn-danger"><i class="fas fa-gavel"></i> Review Now</a>
+{% elif user.role == 'employee' and leave.is_pending %}
+<a href="{% url 'employee_cancel' leave.leave_id %}" class="btn btn-danger" onclick="return confirm('Cancel this leave?')"><i class="fas fa-trash"></i> Cancel</a>
+{% elif user.role == 'manager' and leave.applicant == user and leave.is_pending %}
+<a href="{% url 'manager_cancel' leave.leave_id %}" class="btn btn-danger" onclick="return confirm('Cancel this leave?')"><i class="fas fa-trash"></i> Cancel</a>
+{% endif %}
+</div>
+</div></div></div></div>
+{% endblock %}

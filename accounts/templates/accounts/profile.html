@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="row">
+<div class="col-md-4">
+<div class="card shadow text-center mb-4"><div class="card-body py-4">
+<i class="fas fa-user-circle fa-6x text-primary mb-3"></i>
+<h5 class="font-weight-bold">{{ user.get_full_name|default:user.username }}</h5>
+<span class="badge badge-primary badge-pill p-2 mb-2">{{ user.get_role_display }}</span>
+<hr>
+<p class="mb-1"><i class="fas fa-id-badge text-muted"></i> <strong>ID:</strong> {{ user.employee_id|default:"Not set" }}</p>
+<p class="mb-1"><i class="fas fa-building text-muted"></i> <strong>Dept:</strong> {{ user.department|default:"Not set" }}</p>
+<p class="mb-1"><i class="fas fa-envelope text-muted"></i> {{ user.email }}</p>
+<p class="mb-0"><i class="fas fa-phone text-muted"></i> {{ user.phone|default:"Not set" }}</p>
+</div></div>
+</div>
+<div class="col-md-8">
+<div class="card shadow"><div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-edit"></i> Edit Profile</h5></div>
+<div class="card-body">
+<form method="post">{% csrf_token %}
+{% for f in form %}<div class="form-group"><label class="font-weight-bold">{{ f.label }}</label>{{ f }}</div>{% endfor %}
+<button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Changes</button>
+</form></div></div>
+</div></div>
+{% endblock %}

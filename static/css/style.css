@@ -1,0 +1,62 @@
+/* ── Leave Management System — Custom CSS ── */
+body { background:#f0f2f5; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+
+/* Navbar */
+.navbar-brand { font-size:1.4rem; letter-spacing:.5px; }
+
+/* Cards */
+.card { border:none; border-radius:12px; margin-bottom:1rem; transition: box-shadow .2s; }
+.card:hover { box-shadow: 0 6px 25px rgba(0,0,0,.12) !important; }
+.card-header { border-radius:12px 12px 0 0 !important; font-weight:600; }
+.stat-card { border-radius:12px; }
+
+/* Stats display */
+.stat-card h2 { font-size:2.8rem; font-weight:700; margin-bottom:0; }
+.opacity-50 { opacity:.35; }
+
+/* Buttons */
+.btn { border-radius:8px; font-weight:500; transition: transform .15s; }
+.btn:hover { transform:translateY(-1px); }
+.btn-block { border-radius:8px; }
+
+/* Tables */
+.table thead th { border-top:none; font-weight:700; color:#495057; background:#f8f9fa; }
+.table-hover tbody tr:hover { background:#eef4ff; }
+
+/* Badges */
+.badge { font-size:.8em; padding:.4em .7em; border-radius:6px; }
+
+/* Progress bars */
+.progress { height:14px; border-radius:8px; background:#e9ecef; }
+.progress-bar { border-radius:8px; transition:width .6s ease; }
+
+/* Left border accent */
+.border-left { border-left:4px solid !important; }
+.border-primary { border-color:#007bff !important; }
+.border-danger  { border-color:#dc3545 !important; }
+
+/* Forms */
+.form-control:focus { border-color:#007bff; box-shadow:0 0 0 .2rem rgba(0,123,255,.2); }
+label.font-weight-bold { color:#495057; }
+
+/* Custom radio */
+.custom-control-label { cursor:pointer; font-size:1rem; }
+
+/* Alerts */
+.alert { border:none; border-radius:10px; }
+
+/* Footer */
+footer { font-size:.875rem; }
+
+/* Responsive */
+@media (max-width:576px) {
+  .stat-card h2 { font-size:2rem; }
+  .card-body { padding:.9rem; }
+  .btn-lg { font-size:.95rem; padding:.5rem 1rem; }
+}
+
+/* Print */
+@media print {
+  .navbar, footer, .btn, .card-header .btn, form { display:none !important; }
+  .card { box-shadow:none !important; border:1px solid #ddd !important; }
+}

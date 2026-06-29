@@ -1,0 +1,35 @@
+{% extends 'base.html' %}{% block title %}Team Leaves{% endblock %}
+{% block content %}
+<div class="card shadow">
+<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+<h4 class="mb-0"><i class="fas fa-users"></i> Team Leaves — {{ dept }} Dept (Employees Only)</h4>
+<div>
+<a href="?status=" class="btn btn-sm btn-light {% if not status_filter %}active{% endif %}">All</a>
+<a href="?status=pending" class="btn btn-sm btn-warning {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+<a href="?status=approved" class="btn btn-sm btn-success {% if status_filter == 'approved' %}active{% endif %}">Approved</a>
+<a href="?status=rejected" class="btn btn-sm btn-danger {% if status_filter == 'rejected' %}active{% endif %}">Rejected</a>
+</div></div>
+<div class="card-body p-0">
+{% if leaves %}
+<div class="table-responsive">
+<table class="table table-hover mb-0">
+<thead class="thead-light"><tr><th>Leave ID</th><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
+{% for leave in leaves %}
+<tr>
+<td><span class="badge badge-secondary">LEAVE-{{ leave.leave_id }}</span></td>
+<td><strong>{{ leave.applicant.get_full_name|default:leave.applicant.username }}</strong><br><small class="text-muted">{{ leave.applicant.employee_id }}</small></td>
+<td>{{ leave.get_leave_type_display }}</td>
+<td>{{ leave.start_date|date:"d M Y" }}</td>
+<td>{{ leave.end_date|date:"d M Y" }}</td>
+<td>{{ leave.total_days }}</td>
+<td><span class="badge badge-{{ leave.status_badge }} p-2">{{ leave.get_status_display }}</span></td>
+<td>
+<a href="{% url 'leave_detail' leave.leave_id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
+{% if leave.is_pending %}<a href="{% url 'manager_review' leave.leave_id %}" class="btn btn-sm btn-outline-success"><i class="fas fa-gavel"></i></a>{% endif %}
+</td>
+</tr>{% endfor %}
+</tbody></table></div>
+{% else %}<div class="text-center py-5 text-muted"><i class="fas fa-inbox fa-3x mb-3"></i><p>No applications found.</p></div>{% endif %}
+</div></div>
+{% endblock %}
